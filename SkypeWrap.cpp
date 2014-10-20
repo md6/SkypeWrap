@@ -76,8 +76,8 @@ bool skype_open()
 	return false;
 }
 
-// Load the Skype application
-HINSTANCE load_skype() 
+// Load the Skype application and start hiding ads
+void load_skype() 
 {
 	std::ifstream config_file;
 	std::string line;
@@ -85,7 +85,14 @@ HINSTANCE load_skype()
 	if (config_file.good()) {
 		std::getline(config_file, line);
 		config_file.close();
-		return ShellExecuteA(NULL, "open", line.c_str(), NULL, NULL, SW_SHOWNORMAL);
+		HINSTANCE c = ShellExecuteA(NULL, "open", line.c_str(), NULL, NULL, SW_SHOWNORMAL);
+		if (c) {
+			std::cout << "Skype has been loaded. I will sit in the background and hide ads." << std::endl;
+			while (1) {
+				hide_skype();
+				Sleep(500);
+			}
+		}
 	}
 }
 
@@ -111,24 +118,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 		config_file.close();
 
-		HINSTANCE c = load_skype();
-		if (c) {
-			std::cout << "Skype has been loaded. I will sit in the background and hide ads." << std::endl;
-			while (1) {
-				hide_skype();
-				Sleep(500);
-			}
-		}
+		load_skype();
 	}
 	else {
-		HINSTANCE c = load_skype();
-		if (c) {
-			std::cout << "Skype has been loaded. I will sit in the background and hide ads." << std::endl;
-			while (1) {
-				hide_skype();
-				Sleep(500);
-			}
-		}
+		load_skype();
 	}
 	return 0;
 }
