@@ -67,10 +67,12 @@ bool does_exist(const char* file)
 }
 
 // Is Skype already open?
-// This function is obsolete for now
 bool skype_open() {
 	HWND skype = FindWindow(L"tSkMainForm", 0);
-	return skype;
+	if (skype) {
+		return true;
+	}
+	return false;
 }
 
 // Load the Skype application
@@ -80,13 +82,19 @@ HINSTANCE load_skype() {
 	config_file.open("config.cfg");
 	if (config_file.good()) {
 		std::getline(config_file, line);
-		config_file.close();
 		return ShellExecuteA(NULL, "open", line.c_str(), NULL, NULL, SW_SHOWNORMAL);
 	}
 }
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	if (skype_open()) {
+		std::cout << "Please exit Skype before running SkypeWrap." << std::endl;
+		std::cout << "Press enter to exit..." << std::endl;
+		std::getchar();
+		return 1;
+	}
+
 	std::string skype_path;
 	std::ofstream config_file;
 	bool ads_hidden = false;
