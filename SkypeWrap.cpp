@@ -67,7 +67,8 @@ bool does_exist(const char* file)
 }
 
 // Is Skype already open?
-bool skype_open() {
+bool skype_open() 
+{
 	HWND skype = FindWindow(L"tSkMainForm", 0);
 	if (skype) {
 		return true;
@@ -76,7 +77,8 @@ bool skype_open() {
 }
 
 // Load the Skype application
-HINSTANCE load_skype() {
+HINSTANCE load_skype() 
+{
 	std::ifstream config_file;
 	std::string line;
 	config_file.open("config.cfg");
