@@ -1,5 +1,5 @@
 /*
-	SkypeWrap 0.3 by md6
+	SkypeWrap 0.5 by md6
 	Release date: October 19, 2014
 	This application hides the advertisements within the Windows version of Skype.
 	-------------------------------------------------------------------------------
@@ -10,18 +10,12 @@
 	1) Run SkypeWrap.exe
 	2) Put in the full path to your Skype.exe
 	3) SkypeWrap will create config.cfg and launch Skype
-	4) You will have 30 seconds to login to Skype and make sure that advertisements are showing
-	5) SkypeWrap will then hide the ads and exit
-
+	4) SkypeWrap will load Skype and sit in the background while hiding ads until closed
+	
 	If you have created the config.cfg before:
 	------------------------------------------
 	1) Run SkypeWrap.exe
-	2) You will have 30 seconds to login to Skype and make sure that advertisements are showing
-	3) SkypeWrap will then hide the ads and exit
-
-	If Skype is already running:
-	----------------------------
-	1) Run SkypeWrap to hide ads
+	2) SkypeWrap will load Skype and sit in the background while hiding ads until closed
 
 	-------------------------------------------------------------------------------
 	This program is free software: you can redistribute it and/or modify
@@ -56,9 +50,11 @@ void hide_skype()
 	if (skype) {
 		if (ad1) {
 			ShowWindow(ad1, 0);
-		}
-		if (ad2) {
-			ShowWindow(ad2, 0);
+			Sleep(1000);
+			if (ad2) {
+				ShowWindow(ad2, 0);
+				Sleep(1000);
+			}
 		}
 	}
 }
@@ -68,6 +64,24 @@ bool does_exist(const char* file)
 {
 	std::ifstream infile(file);
 	return infile.good();
+}
+
+// Is Skype already open?
+// This function is obsolete for now
+bool skype_open() {
+	HWND skype = FindWindow(L"tSkMainForm", 0);
+	return skype;
+}
+
+// Load the Skype application
+HINSTANCE load_skype() {
+	std::ifstream config_file;
+	std::string line;
+	config_file.open("config.cfg");
+	if (config_file.good()) {
+		std::getline(config_file, line);
+		return ShellExecuteA(NULL, "open", line.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	}
 }
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -84,50 +98,24 @@ int _tmain(int argc, _TCHAR* argv[])
 			config_file << "\"" + skype_path + "\"";
 		}
 		config_file.close();
-		std::ifstream config_file2;
-		std::string line;
-		Sleep(1000);
-		config_file2.open("config.cfg");
-		if (config_file2.good()) {
-			std::getline(config_file2, line);
-			HINSTANCE c = ShellExecuteA(NULL, "open", line.c_str(), NULL, NULL, SW_SHOWNORMAL);
-			if (c) {
-				std::cout << "Skype has been loaded. Please make sure ads are in view." << std::endl;
-				std::cout << "SkypeWrap will hide ads in 30 seconds and will exit." << std::endl;
-			}
-			Sleep(30000);
-			while (!ads_hidden) {
+
+		HINSTANCE c = load_skype();
+		if (c) {
+			std::cout << "Skype has been loaded. I will sit in the background and hide ads." << std::endl;
+			while (1) {
 				hide_skype();
-				ads_hidden = true;
+				Sleep(500);
 			}
-			return 0;
 		}
-		config_file2.close();
 	}
 	else {
-		HWND skype = FindWindow(L"tSkMainForm", 0);
-		if (skype) {
-			hide_skype();
-		}
-		else {
-			std::ifstream config_file2;
-			std::string line;
-			config_file2.open("config.cfg");
-			if (config_file2.good()) {
-				std::getline(config_file2, line);
-				HINSTANCE c = ShellExecuteA(NULL, "open", line.c_str(), NULL, NULL, SW_SHOWNORMAL);
-				if (c) {
-					std::cout << "Skype has been loaded. Please make sure ads are in view." << std::endl;
-					std::cout << "SkypeWrap will hide ads in 30 seconds and will exit." << std::endl;
-				}
-				Sleep(30000);
-				while (!ads_hidden) {
-					hide_skype();
-					ads_hidden = true;
-				}
-				return 0;
+		HINSTANCE c = load_skype();
+		if (c) {
+			std::cout << "Skype has been loaded. I will sit in the background and hide ads." << std::endl;
+			while (1) {
+				hide_skype();
+				Sleep(500);
 			}
-			config_file2.close();
 		}
 	}
 	return 0;
