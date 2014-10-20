@@ -80,6 +80,7 @@ HINSTANCE load_skype() {
 	config_file.open("config.cfg");
 	if (config_file.good()) {
 		std::getline(config_file, line);
+		config_file.close();
 		return ShellExecuteA(NULL, "open", line.c_str(), NULL, NULL, SW_SHOWNORMAL);
 	}
 }
