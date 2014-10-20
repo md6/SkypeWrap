@@ -41,19 +41,21 @@
 // Hide the Skype ads
 void hide_skype()
 {
-	HWND skype = FindWindow(L"tSkMainForm", 0);
-	HWND child1 = FindWindowEx(skype, 0, L"TChatBanner", 0);
-	HWND child2 = FindWindowEx(child1, 0, L"Shell Embedding", 0);
-	HWND child3 = FindWindowEx(child2, 0, L"Shell DocObject View", 0);
-	HWND ad1 = FindWindowEx(skype, 0, L"TDCEmbedBanner", 0);
-	HWND ad2 = FindWindowEx(child3, 0, L"Internet Explorer_Server", 0);
-	if (skype) {
-		if (ad1) {
-			ShowWindow(ad1, 0);
-			Sleep(1000);
-			if (ad2) {
-				ShowWindow(ad2, 0);
-				Sleep(1000);
+	while (1) {
+		HWND skype = FindWindow(L"tSkMainForm", 0);
+		HWND child1 = FindWindowEx(skype, 0, L"TChatBanner", 0);
+		HWND child2 = FindWindowEx(child1, 0, L"Shell Embedding", 0);
+		HWND child3 = FindWindowEx(child2, 0, L"Shell DocObject View", 0);
+		HWND ad1 = FindWindowEx(skype, 0, L"TDCEmbedBanner", 0);
+		HWND ad2 = FindWindowEx(child3, 0, L"Internet Explorer_Server", 0);
+		if (skype) {
+			if (ad1) {
+				if (ad2) {
+					ShowWindow(ad1, 0);
+					Sleep(500);
+					ShowWindow(ad2, 0);
+					Sleep(500);
+				}
 			}
 		}
 	}
@@ -88,10 +90,6 @@ void load_skype()
 		HINSTANCE c = ShellExecuteA(NULL, "open", line.c_str(), NULL, NULL, SW_SHOWNORMAL);
 		if (c) {
 			std::cout << "Skype has been loaded. I will sit in the background and hide ads." << std::endl;
-			while (1) {
-				hide_skype();
-				Sleep(500);
-			}
 		}
 	}
 }
@@ -119,9 +117,11 @@ int _tmain(int argc, _TCHAR* argv[])
 		config_file.close();
 
 		load_skype();
+		hide_skype();
 	}
 	else {
 		load_skype();
+		hide_skype();
 	}
 	return 0;
 }
