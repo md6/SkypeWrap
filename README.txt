@@ -27,4 +27,4 @@ If you have created the config.cfg before:
 CONTACT
 =======
 
-md6@featureless.net
+mike@mike.us.org
